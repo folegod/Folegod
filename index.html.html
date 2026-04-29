@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOLEGOD — Streamer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --pink: #ff0080;
+    --purple: #bf00ff;
+    --dark: #060609;
+    --dark2: #0e0e16;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--dark); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
+
+  /* SCANLINES */
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+    pointer-events: none; z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 40px;
+    background: linear-gradient(to bottom, rgba(6,6,9,0.97), transparent);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 5px;
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+  .nav-livepix {
+    font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; letter-spacing: 3px;
+    padding: 8px 22px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color: #000; text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    box-shadow: 0 0 20px rgba(0,245,255,0.25);
+    transition: all 0.25s;
+  }
+  .nav-livepix:hover { box-shadow: 0 0 40px rgba(0,245,255,0.5); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 120px 40px 80px;
+    position: relative; overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove { to { background-position: 0 60px; } }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(130px); opacity: 0.1; animation: blobFloat 8s ease-in-out infinite; }
+  .blob-1 { width: 500px; height: 500px; background: var(--purple); top: -100px; left: -100px; }
+  .blob-2 { width: 400px; height: 400px; background: var(--cyan); bottom: -100px; right: -100px; animation-delay: 4s; }
+  @keyframes blobFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-25px)} }
+
+  .hero-content { position: relative; z-index: 2; max-width: 700px; }
+
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--cyan); border: 1px solid rgba(0,245,255,0.3);
+    padding: 6px 16px; border-radius: 2px; margin-bottom: 24px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .live-dot { width: 6px; height: 6px; background: var(--pink); border-radius: 50%; animation: blink 1s infinite; box-shadow: 0 0 6px var(--pink); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 11rem);
+    line-height: 0.9; letter-spacing: 4px;
+    background: linear-gradient(90deg, var(--cyan), var(--pink), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-size: 200%; animation: gradShift 4s ease infinite, fadeUp 0.8s 0.1s ease both;
+  }
+  @keyframes gradShift { 0%,100%{background-position:0%} 50%{background-position:100%} }
+
+  .hero-chips {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    margin: 24px 0 32px; animation: fadeUp 0.8s 0.25s ease both;
+  }
+  .chip {
+    font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
+    padding: 6px 14px; border-radius: 2px;
+  }
+  .chip-tiktok { background: rgba(0,245,255,0.08); border: 1px solid rgba(0,245,255,0.3); color: var(--cyan); }
+  .chip-game   { background: rgba(255,166,0,0.08); border: 1px solid rgba(255,166,0,0.3); color: #ffa600; }
+  .chip-other  { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); }
+
+  /* LIVEPIX HERO BTN — destaque total */
+  .livepix-hero {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 4px;
+    padding: 18px 48px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color: #000; text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    box-shadow: 0 0 50px rgba(0,245,255,0.35);
+    transition: all 0.3s; animation: fadeUp 0.8s 0.35s ease both;
+    position: relative;
+  }
+  .livepix-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    filter: blur(20px); opacity: 0; z-index: -1; transition: opacity 0.3s;
+  }
+  .livepix-hero:hover { transform: translateY(-3px); box-shadow: 0 0 80px rgba(0,245,255,0.55); }
+  .livepix-hero:hover::after { opacity: 0.5; }
+
+  .btn-secondary-link {
+    display: inline-block; margin-top: 16px;
+    font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); text-decoration: none;
+    transition: color 0.3s; animation: fadeUp 0.8s 0.45s ease both;
+  }
+  .btn-secondary-link:hover { color: var(--cyan); }
+
+  /* REDES */
+  .redes { padding: 80px 40px; }
+  .redes-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: 2px; text-align: center; margin-bottom: 48px;
+    color: rgba(255,255,255,0.7);
+  }
+  .redes-title span {
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .cards-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; max-width: 900px; margin: 0 auto;
+  }
+
+  .rede-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px; padding: 28px 20px; text-align: center;
+    text-decoration: none; color: #fff;
+    transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .rede-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; transform: scaleX(0); transition: transform 0.3s; transform-origin: left;
+  }
+  .rede-card.tiktok    { border-color: rgba(0,245,255,0.2); background: rgba(0,245,255,0.03); }
+  .rede-card.tiktok::after  { background: var(--cyan); }
+  .rede-card.yt::after      { background: #ff0000; }
+  .rede-card.kick::after    { background: #53fc18; }
+  .rede-card:hover { transform: translateY(-5px); }
+  .rede-card:hover::after { transform: scaleX(1); }
+  .rede-card.pendente { opacity: 0.4; cursor: default; pointer-events: none; }
+  .rede-card.pendente:hover { transform: none; }
+
+  .rede-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+  .rede-card h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 3px; margin-bottom: 4px; }
+  .rede-card p { font-size: 0.85rem; color: rgba(255,255,255,0.35); font-weight: 600; }
+
+  .pendente-badge {
+    display: inline-block; margin-top: 10px;
+    font-family: 'Space Mono', monospace; font-size: 0.52rem; letter-spacing: 2px;
+    padding: 3px 8px; border-radius: 2px;
+    background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    text-transform: uppercase;
+  }
+  .main-badge {
+    display: inline-block; margin-top: 10px;
+    font-family: 'Space Mono', monospace; font-size: 0.52rem; letter-spacing: 2px;
+    padding: 3px 8px; border-radius: 2px;
+    background: rgba(0,245,255,0.12); color: var(--cyan);
+    border: 1px solid rgba(0,245,255,0.3); text-transform: uppercase;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 28px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 4px;
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-copy { font-family: 'Space Mono', monospace; font-size: 0.55rem; letter-spacing: 2px; color: rgba(255,255,255,0.15); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  @media (max-width: 700px) {
+    nav { padding: 16px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    .redes { padding: 60px 20px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px 20px; }
+  }
+
+  @media (min-width: 1280px) {
+    nav { padding: 22px 80px; }
+    .hero { padding: 120px 80px 80px; }
+    .redes { padding: 100px 80px; }
+    footer { padding: 32px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">FOLEGOD</a>
+  <a href="https://livepix.gg/folegodgg" class="nav-livepix" target="_blank" rel="noopener">⚡ Apoiar</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="hero-content">
+    <div class="live-badge"><span class="live-dot"></span> Streamer Brasileiro</div>
+    <h1 class="hero-name">FOLEGOD</h1>
+
+    <div class="hero-chips">
+      <span class="chip chip-tiktok">🎵 TikTok — Live Principal</span>
+      <span class="chip chip-game">🔫 CS2</span>
+      <span class="chip chip-game">⚛️ React</span>
+      <span class="chip chip-other">+ Outras Gameplays</span>
+    </div>
+
+    <a href="https://livepix.gg/folegodgg" class="livepix-hero" target="_blank" rel="noopener">
+      ⚡ Me Apoia no LivePix
+    </a>
+    <br>
+    <a href="#redes" class="btn-secondary-link">ver minhas redes ↓</a>
+  </div>
+</section>
+
+<!-- REDES -->
+<section class="redes" id="redes">
+  <h2 class="redes-title">MINHAS <span>REDES</span></h2>
+
+  <div class="cards-grid">
+    <!-- TikTok — principal -->
+    <a href="#" class="rede-card tiktok">
+      <span class="rede-icon">🎵</span>
+      <h4>TikTok</h4>
+      <p>Lives ao vivo</p>
+      <span class="main-badge">Principal</span>
+    </a>
+
+    <!-- YouTube — pendente -->
+    <div class="rede-card yt pendente">
+      <span class="rede-icon">📺</span>
+      <h4>YouTube</h4>
+      <p>Lives e clips</p>
+      <span class="pendente-badge">Em breve</span>
+    </div>
+
+    <!-- Kick — pendente -->
+    <div class="rede-card kick pendente">
+      <span class="rede-icon">🟢</span>
+      <h4>Kick</h4>
+      <p>Lives na Kick</p>
+      <span class="pendente-badge">Em breve</span>
+    </div>
+
+    <!-- LivePix — destaque -->
+    <a href="https://livepix.gg/folegodgg" class="rede-card" style="border-color:rgba(0,245,255,0.25);background:rgba(0,245,255,0.04);grid-column:span 3" target="_blank" rel="noopener">
+      <span class="rede-icon">⚡</span>
+      <h4>LivePix — Me Apoia!</h4>
+      <p>livepix.gg/folegodgg</p>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">FOLEGOD</div>
+  <p class="footer-copy">© 2025 Folegod · Todos os direitos reservados</p>
+</footer>
+
+</body>
+</html>
